@@ -1,16 +1,19 @@
 ﻿using dscc_web_app.Models;
 using dscc_web_app.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace dscc_web_app.Controllers
 {
     public class PostController : Controller
     {
-        private readonly PostService _postService;
+        private readonly IPostService _postService;
+        private readonly IAuthorService _authorService;
 
-        public PostController(PostService postService)
+        public PostController(IPostService postService, IAuthorService authorService)
         {
             _postService = postService;
+            _authorService = authorService;
         }
 
         // GET: Post/Index
@@ -33,16 +36,26 @@ namespace dscc_web_app.Controllers
         }
 
         // GET: Post/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var authors = await _authorService.GetAuthorsAsync();
+            var authorSelectList = authors.Select(a => new SelectListItem 
+                { Value = a.AuthorId.ToString(), Text = $"{a.FirstName} {a.LastName}" }).ToList();
+            var viewModel = new PostViewModel
+            {
+                PublicationDate= DateTime.Now,
+                LastUpdated = DateTime.Now,
+                AuthorSelectList = new SelectList(authorSelectList, "Value", "Text")
+            };
+            return View(viewModel);
         }
 
-        // POST: Post/Create
+        // POST: Post/CreatePost
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(PostViewModel post)
+        public async Task<IActionResult> CreatePost(PostViewModel post)
         {
+            ModelState.Remove("postId");
             if (ModelState.IsValid)
             {
                 var response = await _postService.CreatePostAsync(post);
@@ -55,7 +68,17 @@ namespace dscc_web_app.Controllers
                     ModelState.AddModelError(string.Empty, "Failed to create the post. Please try again.");
                 }
             }
-            return View(post);
+
+            var authors = await _authorService.GetAuthorsAsync();
+            var authorSelectList = authors.Select(a => new SelectListItem
+            { Value = a.AuthorId.ToString(), Text = $"{a.FirstName} {a.LastName}" }).ToList();
+            var viewModel = new PostViewModel
+            {
+                PublicationDate = DateTime.Now,
+                LastUpdated = DateTime.Now,
+                AuthorSelectList = new SelectList(authorSelectList, "Value", "Text")
+            };
+            return View(viewModel);
         }
 
         // GET: Post/Edit/5
@@ -67,17 +90,30 @@ namespace dscc_web_app.Controllers
                 return NotFound();
             }
 
-            return View(post);
+            var authors = await _authorService.GetAuthorsAsync();
+            var authorSelectList = authors.Select(a => new SelectListItem
+            { Value = a.AuthorId.ToString(), Text = $"{a.FirstName} {a.LastName}" }).ToList();
+            var viewModel = new PostViewModel
+            {
+                PostId = post.PostId,
+                Title = post.Title,
+                Content = post.Content,
+                PublicationDate = post.PublicationDate,
+                LastUpdated = post.LastUpdated,
+                AuthorId = post.AuthorId,
+                AuthorSelectList = new SelectList(authorSelectList, "Value", "Text")
+            };
+            return View(viewModel);
         }
 
-        // POST: Post/Edit/5
+        // POST: Post/EditPost/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, PostViewModel post)
+        public async Task<IActionResult> EditPost(PostViewModel post)
         {
             if (ModelState.IsValid)
             {
-                var response = await _postService.UpdatePostAsync(id, post);
+                var response = await _postService.UpdatePostAsync(post);
                 if (response.IsSuccessStatusCode)
                 {
                     return RedirectToAction(nameof(Index));
@@ -87,7 +123,21 @@ namespace dscc_web_app.Controllers
                     ModelState.AddModelError(string.Empty, "Failed to update the post. Please try again.");
                 }
             }
-            return View(post);
+
+            var authors = await _authorService.GetAuthorsAsync();
+            var authorSelectList = authors.Select(a => new SelectListItem
+            { Value = a.AuthorId.ToString(), Text = $"{a.FirstName} {a.LastName}" }).ToList();
+            var viewModel = new PostViewModel
+            {
+                PostId = post.PostId,
+                Title = post.Title,
+                Content = post.Content,
+                PublicationDate = post.PublicationDate,
+                LastUpdated = post.LastUpdated,
+                AuthorId = post.AuthorId,
+                AuthorSelectList = new SelectList(authorSelectList, "Value", "Text")
+            };
+            return View(viewModel);
         }
 
         // GET: Post/Delete/5
@@ -102,10 +152,10 @@ namespace dscc_web_app.Controllers
             return View(post);
         }
 
-        // POST: Post/DeleteConfirmed/5
+        // POST: Post/DeletePost/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeletePost(int id)
         {
             var response = await _postService.DeletePostAsync(id);
             if (response.IsSuccessStatusCode)
@@ -115,7 +165,7 @@ namespace dscc_web_app.Controllers
             else
             {
                 ModelState.AddModelError(string.Empty, "Failed to delete the post. Please try again.");
-                return View(await _postService.GetPostAsync(id));
+                return View("Delete", "Post");
             }
         }
     }

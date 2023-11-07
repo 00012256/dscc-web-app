@@ -6,8 +6,8 @@ namespace dscc_web_app.Services
     {
         Task<HttpResponseMessage> CreateAuthorAsync(AuthorViewModel author);
         Task<HttpResponseMessage> DeleteAuthorAsync(int id);
-        Task<AuthorViewModel> GetAuthorAsync(int id);
-        Task<IEnumerable<AuthorViewModel>> GetAuthorsAsync();
-        Task<HttpResponseMessage> UpdateAuthorAsync(int id, AuthorViewModel author);
+        Task<AuthorViewModel?> GetAuthorAsync(int id);
+        Task<IEnumerable<AuthorViewModel>?> GetAuthorsAsync();
+        Task<HttpResponseMessage> UpdateAuthorAsync(AuthorViewModel author);
     }
 }

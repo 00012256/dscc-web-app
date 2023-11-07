@@ -6,9 +6,9 @@ namespace dscc_web_app.Controllers
 {
     public class AuthorController : Controller
     {
-        private readonly AuthorService _authorService;
+        private readonly IAuthorService _authorService;
 
-        public AuthorController(AuthorService authorService)
+        public AuthorController(IAuthorService authorService)
         {
             _authorService = authorService;
         }
@@ -37,11 +37,12 @@ namespace dscc_web_app.Controllers
             return View();
         }
 
-        // POST: Author/Create
+        // POST: Author/CreateAuthor
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(AuthorViewModel author)
+        public async Task<IActionResult> CreateAuthor(AuthorViewModel author)
         {
+            ModelState.Remove("authorId");
             if (ModelState.IsValid)
             {
                 var response = await _authorService.CreateAuthorAsync(author);
@@ -69,17 +70,17 @@ namespace dscc_web_app.Controllers
             return View(author);
         }
 
-        // POST: Author/Edit/5
+        // POST: Author/EditAuthor
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, AuthorViewModel author)
+        public async Task<IActionResult> EditAuthor(AuthorViewModel author)
         {
             if (ModelState.IsValid)
             {
-                var response = await _authorService.UpdateAuthorAsync(id, author);
+                var response = await _authorService.UpdateAuthorAsync(author);
                 if (response.IsSuccessStatusCode)
                 {
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Index", "Author");
                 }
                 else
                 {
@@ -101,20 +102,19 @@ namespace dscc_web_app.Controllers
             return View(author);
         }
 
-        // POST: Author/DeleteConfirmed/5
+        // POST: Author/DeleteAuthor/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteAuthor(int id)
         {
             var response = await _authorService.DeleteAuthorAsync(id);
             if (response.IsSuccessStatusCode)
             {
                 return RedirectToAction(nameof(Index));
-            }
-            else
+            } else
             {
                 ModelState.AddModelError(string.Empty, "Failed to delete the author. Please try again.");
-                return RedirectToAction(nameof(Index));
+                return View("Delete", "Author");
             }
         }
     }

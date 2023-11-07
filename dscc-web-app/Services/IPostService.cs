@@ -6,8 +6,8 @@ namespace dscc_web_app.Services
     {
         Task<HttpResponseMessage> CreatePostAsync(PostViewModel post);
         Task<HttpResponseMessage> DeletePostAsync(int id);
-        Task<PostViewModel> GetPostAsync(int id);
-        Task<IEnumerable<PostViewModel>> GetPostsAsync();
-        Task<HttpResponseMessage> UpdatePostAsync(int id, PostViewModel post);
+        Task<PostViewModel?> GetPostAsync(int id);
+        Task<IEnumerable<PostViewModel>?> GetPostsAsync();
+        Task<HttpResponseMessage> UpdatePostAsync(PostViewModel post);
     }
 }

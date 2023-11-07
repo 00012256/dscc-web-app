@@ -1,10 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace dscc_web_app.Models
 {
     public class PostViewModel
     {
+        public PostViewModel()
+        {
+            AuthorSelectList = new SelectList(Enumerable.Empty<SelectListItem>());
+        }
+
         public int PostId { get; set; }
 
         [Required]
@@ -23,7 +28,6 @@ namespace dscc_web_app.Models
 
         public int AuthorId { get; set; }
 
-        [JsonIgnore]
-        public AuthorViewModel Author { get; set; }
+        public SelectList AuthorSelectList { get; set; }
     }
 }

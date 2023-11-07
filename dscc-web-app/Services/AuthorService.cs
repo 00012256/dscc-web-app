@@ -15,16 +15,14 @@ namespace dscc_web_app.Services
 
         private string ApiBaseUrl => _configuration.GetSection("ApiBaseUrl").Value;
 
-        public async Task<IEnumerable<AuthorViewModel>> GetAuthorsAsync()
+        public async Task<IEnumerable<AuthorViewModel>?> GetAuthorsAsync()
         {
-            var response = await _httpClient.GetFromJsonAsync<IEnumerable<AuthorViewModel>>(ApiBaseUrl + "/api/authors");
-            return response;
+            return await _httpClient.GetFromJsonAsync<IEnumerable<AuthorViewModel>>(ApiBaseUrl + "/api/authors");
         }
 
-        public async Task<AuthorViewModel> GetAuthorAsync(int id)
+        public async Task<AuthorViewModel?> GetAuthorAsync(int id)
         {
-            var response = await _httpClient.GetFromJsonAsync<AuthorViewModel>(ApiBaseUrl + $"/api/authors/{id}");
-            return response;
+            return await _httpClient.GetFromJsonAsync<AuthorViewModel>(ApiBaseUrl + $"/api/authors/{id}");
         }
 
         public async Task<HttpResponseMessage> CreateAuthorAsync(AuthorViewModel author)
@@ -32,9 +30,9 @@ namespace dscc_web_app.Services
             return await _httpClient.PostAsJsonAsync(ApiBaseUrl + "/api/authors", author);
         }
 
-        public async Task<HttpResponseMessage> UpdateAuthorAsync(int id, AuthorViewModel author)
+        public async Task<HttpResponseMessage> UpdateAuthorAsync(AuthorViewModel author)
         {
-            return await _httpClient.PutAsJsonAsync(ApiBaseUrl + $"/api/authors/{id}", author);
+            return await _httpClient.PutAsJsonAsync(ApiBaseUrl + $"/api/authors/{author.AuthorId}", author);
         }
 
         public async Task<HttpResponseMessage> DeleteAuthorAsync(int id)

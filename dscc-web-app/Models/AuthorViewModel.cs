@@ -17,7 +17,5 @@ namespace dscc_web_app.Models
         public string Email { get; set; }
 
         public string Biography { get; set; }
-
-        public List<PostViewModel> Posts { get; set; }
     }
 }
